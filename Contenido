@@ -1,0 +1,325 @@
+
+@echo off
+REM Asegurar System32 en PATH
+set PATH=%SystemRoot%\System32;%PATH%
+cls
+color 0C
+cls
+REM Verificación básica
+adb devices | findstr /r "device$" >nul
+if errorlevel 1 (
+  echo [ERROR] 
+  pause
+  exit /b 1
+)
+
+setlocal enabledelayedexpansion
+cls
+echo [AVISO] Debes saber lo que estas haciendo.
+echo Este script deshabilita paquetes de personalizacion y extras del sistema.
+echo Algunos ajustes de interfaz dejaran de estar disponibles.
+pause
+cls
+color 0A
+REM ============================================
+REM Se desabilitaran Paquetes/Apps en Total: 278)
+REM Script en desarrollo - Android Core Limpiador
+REM ============================================
+for %%A in (
+  com.android.theme.font.sanfrancisco
+  com.android.theme.font.storopia
+  com.android.theme.font.sansserif
+  com.android.theme.icon.leaf
+  com.android.theme.icon.meow
+  com.android.theme.icon.pebble
+  org.lineageos.overlay.customization.blacktheme
+  com.android.systemui.clocks.metro
+  org.risingos.backgrounds
+  com.libremobileos.sidebar
+  org.omnirom.omnijaws
+  com.android.internal.display.cutout.emulation.corner
+  com.android.internal.display.cutout.emulation.double
+  com.android.uwb.resources
+  com.android.cts.priv.ctsshim
+  com.android.theme.icon_pack.gradicon.android
+  com.android.theme.icon.scroll
+  com.android.theme.icon.square
+  com.android.theme.icon.vessel
+  com.android.theme.icon_pack.nostalgic.systemui
+  com.android.theme.icon_pack.acherus.systemui
+  com.android.theme.icon_pack.rounded.systemui
+  com.android.theme.icon.taperedrect
+  com.android.theme.icon_pack.oos.android
+  com.android.theme.font.nokiapure
+  com.android.theme.font.comfortaa
+  com.android.theme.font.comicsans
+  com.android.theme.font.amarante
+  com.android.theme.font.aclonica
+  com.android.theme.font.nothingdotheadline
+  com.android.theme.icon_pack.outline.systemui
+  com.android.theme.icon_pack.rounded.android
+  com.android.theme.icon_pack.xperia.systemui
+  com.android.theme.icon_pack.victor.systemui
+  com.android.theme.icon_pack.pui.systemui
+  org.omnirom.omnijaws.auto_generated_rro_product__
+  org.lineageos.sm6375.EuiccOverlay
+  org.lineageos.lineageparts.auto_generated_rro_product__
+  org.lineageos.lineagesettings.auto_generated_rro_product__
+  com.android.settings.overlay.miami
+  com.android.systemui.auto_generated_rro_product__
+  com.android.systemui.clocks.bignum
+  com.android.systemui.plugin.globalactions.wallet
+  com.android.avatarpicker
+  android.overlay.moto.common
+  io.chaldeaprjkt.gamespace.auto_generated_rro_product__
+  com.mtg.gmssettingsoverlay
+  vendor.qti.hardware.cacert.server
+  com.android.htmlviewer
+  com.android.companiondevicemanager
+  com.android.virtualmachine.res
+  com.android.scheduling
+  com.stevesoltys.seedvault
+  com.android.adservices
+  com.android.appsearch
+  com.android.health.connect.backuprestore
+  com.android.federatedcompute.services
+  com.google.android.googlequicksearchbox
+  com.android.theme.icon_pack.plumpy.systemui
+  com.android.theme.font.jetbrainsmono
+  com.android.theme.font.samsungone
+  com.android.theme.font.nunito
+  com.android.theme.font.cookierun
+  com.android.theme.icon_pack.gradicon.systemui
+  com.android.theme.font.oswald
+  com.android.theme.font.coolstory
+  com.android.theme.icon_pack.sam.android
+  com.android.theme.font.notoserifsource
+  com.android.theme.icon_pack.filled.android
+  com.android.theme.font.quando
+  com.android.theme.icon_pack.circular.systemui
+  com.android.theme.font.surfer
+  com.android.theme.icon_pack.pui.android
+  com.android.theme.icon_pack.kai.android
+  com.android.theme.font.ubuntu
+  com.android.theme.font.robotocondensed
+  com.android.theme.font.atkinson
+  com.android.theme.icon.hexagon
+  com.android.theme.icon.ios
+  com.android.theme.icon_pack.plumpy.android
+  com.android.theme.icon.squircle
+  com.android.theme.icon_pack.victor.android
+  com.android.theme.icon_pack.aurora.systemui
+  com.android.theme.icon.cylinder
+  com.android.theme.font.oneplussans
+  com.android.theme.font.accuratist
+  com.android.theme.icon.samsung
+  com.android.theme.icon.cloudy
+  com.android.theme.icon.roundedrect
+  com.android.theme.icon_pack.aurora.android
+  com.android.theme.font.linotte
+  com.android.theme.font.grandhotel
+  com.android.theme.icon.flower
+  com.android.theme.font.lato
+  com.android.theme.font.play
+  com.android.theme.icon_pack.circular.android
+  com.android.theme.font.redressed
+  com.android.dreams.basic
+  com.android.photopicker
+  com.android.customization.themes
+  com.android.dreams.phototable
+  com.android.wallpaper.livepicker
+  com.android.wallpaper
+  com.android.wallpaperbackup
+    com.android.theme.font.sanfrancisco
+    com.android.theme.font.storopia
+    com.android.theme.font.sansserif
+    com.android.theme.icon.leaf
+    com.android.theme.icon.meow
+    com.android.theme.icon.pebble
+    org.lineageos.overlay.customization.blacktheme
+    com.android.systemui.clocks.metro
+    org.risingos.backgrounds
+    com.libremobileos.sidebar
+    org.omnirom.omnijaws
+    com.android.internal.display.cutout.emulation.corner
+    com.android.internal.display.cutout.emulation.double
+    com.android.uwb.resources
+    com.android.cts.priv.ctsshim
+    com.android.theme.icon_pack.gradicon.android
+    com.android.theme.icon.scroll
+    com.android.theme.icon.square
+    com.android.theme.icon.vessel
+    com.android.theme.icon_pack.nostalgic.systemui
+    com.android.theme.icon_pack.acherus.systemui
+    com.android.theme.icon_pack.rounded.systemui
+    com.android.theme.icon.taperedrect
+    com.android.theme.icon_pack.oos.android
+    com.android.theme.font.nokiapure
+    com.android.theme.font.comfortaa
+    com.android.theme.font.comicsans
+    com.android.theme.font.amarante
+    com.android.theme.font.aclonica
+    com.android.theme.font.nothingdotheadline
+    com.android.theme.icon_pack.outline.systemui
+    com.android.theme.icon_pack.rounded.android
+    com.android.theme.icon_pack.xperia.systemui
+    com.android.theme.icon_pack.victor.systemui
+    com.android.theme.icon_pack.pui.systemui
+    org.omnirom.omnijaws.auto_generated_rro_product__
+    org.lineageos.sm6375.EuiccOverlay
+    org.lineageos.lineageparts.auto_generated_rro_product__
+    org.lineageos.lineagesettings.auto_generated_rro_product__
+    com.android.settings.overlay.miami
+    com.android.systemui.auto_generated_rro_product__
+    com.android.systemui.clocks.bignum
+    com.android.systemui.plugin.globalactions.wallet
+    com.android.avatarpicker
+    android.overlay.moto.common
+    io.chaldeaprjkt.gamespace.auto_generated_rro_product__
+    com.mtg.gmssettingsoverlay
+    vendor.qti.hardware.cacert.server
+    com.android.htmlviewer
+    com.android.companiondevicemanager
+    com.android.virtualmachine.res
+    com.android.scheduling
+    com.stevesoltys.seedvault
+    com.android.adservices
+    com.android.appsearch
+    com.android.health.connect.backuprestore
+    com.android.federatedcompute.services
+    com.google.android.googlequicksearchbox
+    com.android.theme.font.harmonysans
+    com.android.theme.icon_pack.oos.systemui
+    com.android.systemui.clocks.growth
+    com.android.theme.icon_pack.lorn.android
+    com.android.internal.systemui.navbar.threebutton
+    com.android.theme.font.sonysketch
+    com.android.theme.icon_pack.acherus.android
+    com.android.theme.font.cocon
+    com.android.theme.font.rubik
+    com.android.theme.font.cagliostro
+    com.android.systemui.clocks.numoverlap
+    com.android.theme.icon.roundedhexagon
+    com.android.theme.icon_pack.xperia.android
+    com.android.theme.font.oneplusslate
+    com.android.systemui.clocks.calligraphy
+    com.android.theme.font.fifa2018
+    com.android.theme.icon.heart
+    com.android.theme.font.nothingdot
+    com.android.theme.icon_pack.kai.systemui
+    com.android.theme.font.reemkufi
+    com.android.theme.icon.stretched
+    com.android.theme.icon_pack.outline.android
+    com.android.theme.font.bariol
+    com.android.theme.icon_pack.sam.systemui
+    com.android.theme.icon.teardrop
+    com.android.theme.font.exotwo
+    com.android.egg
+    com.android.dreams.basic
+    com.android.photopicker
+    com.android.customization.themes
+    org.protonaosp.deviceconfig.auto_generated_rro_product__
+    org.protonaosp.deviceconfig
+    org.protonaosp.columbus.auto_generated_rro_product__
+    android.overlay.common
+    android.overlay.target
+    com.android.internal.display.cutout.emulation
+    com.google.android.marvin.talkback
+    com.google.android.apps.wellbeing
+    com.android.theme.font.harmonysans
+    com.android.theme.icon_pack.oos.systemui
+    com.android.systemui.clocks.growth
+    com.android.theme.icon_pack.lorn.android
+    com.android.internal.systemui.navbar.threebutton
+    com.android.theme.font.sonysketch
+    com.android.theme.icon_pack.acherus.android
+    com.android.theme.font.cocon
+    com.android.theme.font.rubik
+    com.android.theme.font.cagliostro
+    com.android.systemui.clocks.numoverlap
+    com.android.theme.icon.roundedhexagon
+    com.android.theme.icon_pack.xperia.android
+    com.android.theme.font.oneplusslate
+    com.android.systemui.clocks.calligraphy
+    com.android.theme.font.fifa2018
+    com.android.theme.icon.heart
+    com.android.theme.font.nothingdot
+    com.android.theme.icon_pack.kai.systemui
+    com.android.theme.font.reemkufi
+    com.android.theme.icon.stretched
+    com.android.theme.icon_pack.outline.android
+    com.android.theme.font.bariol
+    com.android.theme.icon_pack.sam.systemui
+    com.android.theme.icon.teardrop
+    com.android.theme.font.exotwo
+    com.android.egg
+    com.android.dreams.basic
+    com.android.photopicker
+    com.android.customization.themes
+    com.org.protonaosp.deviceconfig.auto_generated_rro_product__
+    com.org.protonaosp.deviceconfig
+    com.org.protonaosp.columbus.auto_generated_rro_product__
+    com.android.overlay.common
+    com.android.overlay.target
+    com.android.theme.icon_pack.plumpy.systemui
+    com.android.theme.font.jetbrainsmono
+    com.android.theme.font.samsungone
+    com.android.theme.font.nunito
+    com.android.theme.font.cookierun
+    com.android.theme.icon_pack.gradicon.systemui
+    com.android.theme.font.oswald
+    com.android.theme.font.coolstory
+    com.android.theme.icon_pack.sam.android
+    com.android.theme.font.notoserifsource
+    com.android.theme.icon_pack.filled.android
+    com.android.theme.font.quando
+    com.android.theme.icon_pack.circular.systemui
+    com.android.theme.font.surfer
+    com.android.theme.icon_pack.pui.android
+    com.android.theme.icon_pack.kai.android
+    com.android.theme.font.ubuntu
+    com.android.theme.font.robotocondensed
+    com.android.theme.font.atkinson
+    com.android.theme.icon.hexagon
+    com.android.theme.icon.ios
+    com.android.theme.icon_pack.plumpy.android
+    com.android.theme.icon.squircle
+    com.android.theme.icon_pack.victor.android
+    com.android.theme.icon_pack.aurora.systemui
+    com.android.theme.icon.cylinder
+    com.android.theme.font.oneplussans
+    com.android.theme.font.accuratist
+    com.android.theme.icon.samsung
+    com.android.theme.icon.cloudy
+    com.android.theme.icon.roundedrect
+    com.android.theme.icon_pack.aurora.android
+    com.android.theme.font.linotte
+    com.android.theme.font.grandhotel
+    com.android.theme.icon.flower
+    com.android.theme.font.lato
+    com.android.theme.font.play
+    com.android.theme.icon_pack.circular.android
+    com.android.theme.font.redressed
+    com.android.dreams.phototable
+    com.android.wallpaper.livepicker
+    com.android.wallpaper
+    com.android.wallpaperbackup
+) do (
+  echo Deshabilitando %%A ...
+  adb shell pm disable-user --user 0 %%A
+)
+color 0E
+echo ==============================================
+echo Aqui puedes revisar lo que se ha realizado.
+echo Ahora Solo queda un paso: ver el ultimo mensaje y salir.
+echo =========================================================
+pause
+
+color 07
+
+echo.
+echo [OK] Felicidades. Tu sistema ahora conserva unicamente lo estrictamente necesario.
+echo Debes saber que varios ajustes de personalizacion de la interfaz no estaran disponibles.
+echo En caso de detectar algun error, por favor reportalo al usuario : @LiebeBlack0 en Telegram.
+pause
+start "" "https://t.me/LiebeBlack0"
