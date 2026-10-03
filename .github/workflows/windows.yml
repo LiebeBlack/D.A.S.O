@@ -57,21 +57,32 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Habilitar GNUstep en Windows
-        run: |
-          # Requisito de la extensión de WinUI en agentes sin VS completo.
-          choco install gnustep -y --no-progress --limit-output
-        shell: pwsh
-
-      - name: Instalar Visual Studio 2022 con la carga de trabajo de WinUI
-        run: |
-          & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" `
-            -latest -products * `
-            -requires Microsoft.VisualStudio.Workload.Universal `
-            -property installationPath
-        shell: pwsh
-
+      # El job anterior ya instala MSVC. Lo unico que puede faltar en el
+      # agente es el SDK de Windows, asi que se comprueba en vez de instalar a
+      # ciegas: antes se intentaba `choco install gnustep`, un truco para la
+      # extension de WinUI de Visual Studio que aqui no aplica (compilamos con
+      # MSBuild, no con el VSIX) y cuyo paquete ya no existe en Chocolatey.
       - uses: microsoft/setup-msbuild@v2
+
+      - name: Comprobar el SDK de Windows
+        shell: pwsh
+        run: |
+          $kits = Get-ChildItem 'C:\Program Files (x86)\Windows Kits\10\Include' -Directory -ErrorAction SilentlyContinue
+          if (-not $kits) {
+            Write-Error "El agente no trae Windows SDK. Falta la carga 'Universal Windows Platform development'."
+            exit 1
+          }
+          Write-Host "SDK encontrados: $($kits.Name -join ', ')"
+
+      - name: Localizar Visual Studio 2022
+        shell: pwsh
+        run: |
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -property installationPath
+          if (-not $vs) {
+            Write-Error "No se encontro Visual Studio en el agente"
+            exit 1
+          }
+          Write-Host "VS: $vs"
 
       - name: Restaurar paquetes NuGet
         run: msbuild DASO-WinUI3/daso.sln -t:Restore -p:Configuration=Release -p:Platform=x64
