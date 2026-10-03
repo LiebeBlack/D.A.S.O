@@ -46,8 +46,9 @@ jobs:
 
       - name: Informar del estándar realmente usado
         shell: pwsh
-        run: |
-          cmake -S DASO-WinUI3 -B build -LA | Select-String 'DASO_CXX_STANDARD'
+        # El estandar deja de ser una variable de entrada: el CMakeLists lo
+        # detecta y anuncia durante la configuracion.
+        run: cmake -S DASO-WinUI3 -B build -LA | Select-String 'DASO_CXX_STANDARD_FLAG'
 
   app:
     name: Aplicación WinUI 3
