@@ -80,13 +80,24 @@
 
   <ItemGroup>
     <!--
-      Despliegue sin paquete: se quita la referencia de framework UAP que
-      arrastran las plantillas de WinUI. Es el otro mitad del arreglo del
-      error de NuGet, y se deja explicito para que no vuelva al restaurarse
-      paquetes de forma automatica.
+      NuGet necesita un moniker de destino para resolver los paquetes. El
+      error original decia exactamente esto:
+
+        Add a reference to "UAP,Version=v10.0" in the "TargetFrameworks" property
+
+      Y este otro ("Sequence contains no elements" en GiveErrorForMissingFramework)
+      lo provoco yo al anadir <FrameworkReference Remove="UAP" />: al quitar
+      TODOS los framework references, NuGet se queda sin lista de donde elegir
+      el destino y revienta al intentar reportar el problema.
+
+      Se declara el moniker y no se quita ninguna referencia.
     -->
-    <FrameworkReference Remove="UAP" />
+    <FrameworkReference Include="Windows Universal" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFrameworks>UAP;Windows</TargetFrameworks>
+  </PropertyGroup>
 
   <ItemDefinitionGroup>
     <ClCompile>
