@@ -26,6 +26,9 @@ jobs:
       - name: Herramientas de compilación MSVC
         uses: microsoft/setup-msbuild@v2
 
+      - name: Comprobar coherencia del proyecto y del instalador
+        run: python DASO-WinUI3/tools/check_project.py
+
       - name: Comprobar que el catálogo generado está al día
         shell: pwsh
         run: |

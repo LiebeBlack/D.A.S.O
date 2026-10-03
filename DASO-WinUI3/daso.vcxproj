@@ -131,6 +131,7 @@
   <ItemGroup>
     <ClCompile Include="src\platform\src\process.cpp" />
     <ClCompile Include="src\platform\src\adb.cpp" />
+    <ClCompile Include="src\platform\src\manifest_store.cpp" />
   </ItemGroup>
 
   <!-- Capa WinUI 3 (sin XAML) -->
@@ -150,6 +151,7 @@
     <ClInclude Include="src\core\include\daso\plan.hpp" />
     <ClInclude Include="src\platform\include\daso\adb.hpp" />
     <ClInclude Include="src\platform\include\daso\process.hpp" />
+    <ClInclude Include="src\platform\include\daso\manifest_store.hpp" />
     <ClInclude Include="src\platform\include\daso\manifest_store.hpp" />
     <ClInclude Include="src\ui\include\daso\ui\ui_common.hpp" />
     <ClInclude Include="src\ui\include\daso\ui\main_window.hpp" />
