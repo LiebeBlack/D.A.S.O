@@ -13,15 +13,12 @@ on:
   pull_request:
   workflow_dispatch:
 
-env:
-  DASO_CXX_STANDARD: c++26preview
-
 jobs:
   core:
     name: Núcleo (ISO C++26, sin Windows SDK)
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Herramientas de compilación MSVC
         uses: microsoft/setup-msbuild@v2
@@ -57,7 +54,7 @@ jobs:
     runs-on: windows-2022
     needs: core
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Habilitar GNUstep en Windows
         run: |
@@ -97,7 +94,7 @@ jobs:
     runs-on: windows-2022
     needs: app
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: actions/download-artifact@v4
         with:
@@ -129,7 +126,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: actions/download-artifact@v4
         with:

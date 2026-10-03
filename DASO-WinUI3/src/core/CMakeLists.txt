@@ -6,31 +6,43 @@
 cmake_minimum_required(VERSION 3.24)
 project(daso_core LANGUAGES CXX)
 
-# Estandar con cadena de respaldo. `c++20` NO sirve: el manifiesto usa
-# std::expected, que es C++23. Verificado con GCC 16.2:
-#   c++26 -> OK (75 casos, 6593 comprobaciones, 0 fallos)
-#   c++23 -> OK (identico)
-# Se prueba en orden y se baja al primero que compile.
-set(DASO_CXX_STANDARD "c++26" CACHE STRING "Estandar de C++ para el nucleo")
-set_property(CACHE DASO_CXX_STANDARD PROPERTY STRINGS c++26 c++23)
+# Estandar de C++, con cadena de respaldo POR COMPILADOR.
+#
+# Aqui estuvo el bug que rompio CI: se probaba `-std=c++26`, que es la
+# sintaxis de GCC/Clang. MSVC no la acepta; la suya es `/std:c++26preview`, y
+# solo existe desde VS 17.14. Con MSVC 19.44 el primer nombre que se reconoce
+# suele ser `/std:c++latest`, que es exactamente para lo que sirve la cadena.
+#
+# Verificado con GCC 16.2:
+#   -std=c++26 -> OK (83 casos, 6615 comprobaciones, 0 fallos)
+#   -std=c++23 -> OK (identico)
+# Por que no c++20: el manifiesto usa std::expected, que es C++23.
 
 include(CheckCXXCompilerFlag)
-set(DASO_STANDARD_RESOLVED "")
-foreach(_std IN LISTS DASO_CXX_STANDARD)
-  string(MAKE_C_IDENTIFIER "HAS${_std}" _var)
-  check_cxx_compiler_flag("-std=${_std}" ${_var})
+
+if(MSVC)
+  set(_daso_std_flags /std:c++26preview /std:c++latest /std:c++23preview)
+else()
+  set(_daso_std_flags -std=c++26 -std=c++23 -std=c++20)
+endif()
+
+set(DASO_CXX_STANDARD_FLAG "")
+foreach(_flag IN LISTS _daso_std_flags)
+  string(MAKE_C_IDENTIFIER "HAS${_flag}" _var)
+  check_cxx_compiler_flag("${_flag}" ${_var})
   if(${_var})
-    set(DASO_STANDARD_RESOLVED "${_std}")
+    set(DASO_CXX_STANDARD_FLAG "${_flag}")
     break()
   endif()
+  message(STATUS "D.A.S.O: ${_flag} no lo admite ${CMAKE_CXX_COMPILER_ID}, se prueba el siguiente")
 endforeach()
 
-if(NOT DASO_STANDARD_RESOLVED)
+if(NOT DASO_CXX_STANDARD_FLAG)
   message(FATAL_ERROR
-    "Ningun estandar soportado (${DASO_CXX_STANDARD}) compila con ${CMAKE_CXX_COMPILER}. "
-    "Actualiza el toolset o baja DASO_CXX_STANDARD.")
+    "Ningun estandar soportado (${_daso_std_flags}) compila con ${CMAKE_CXX_COMPILER}. "
+    "Actualiza el toolset.")
 endif()
-message(STATUS "D.A.S.O: nucleo compilando con -std=${DASO_STANDARD_RESOLVED}")
+message(STATUS "D.A.S.O: nucleo con ${DASO_CXX_STANDARD_FLAG} (${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION})")
 
 add_library(daso_core STATIC
   src/catalog.cpp
@@ -40,7 +52,11 @@ add_library(daso_core STATIC
   src/plan.cpp
 )
 
-target_compile_features(daso_core PUBLIC cxx_std_23)
+# El flag de estandar va aqui, NO con target_compile_features(cxx_std_23):
+# CMake anade su propio /std: o -std: y, al ser posterior en la linea de
+# comandos, el mas bajo gana y se pierde el C++26 detectado arriba.
+target_compile_options(daso_core PUBLIC "${DASO_CXX_STANDARD_FLAG}")
+
 target_compile_options(daso_core PRIVATE
   $<$<CXX_COMPILER_ID:MSVC>:/W4 /permissive- /utf-8 /Zc:__cplusplus>
   $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra>
@@ -50,8 +66,9 @@ target_include_directories(daso_core PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
 
+# Sin CXX_STANDARD_REQUIRED: CMake no debe intentar negociar el estandar, el
+# flag resuelto arriba es la unica fuente de verdad.
 set_target_properties(daso_core PROPERTIES
-  CXX_STANDARD_REQUIRED ON
   CXX_EXTENSIONS OFF
 )
 
