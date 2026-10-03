@@ -1,0 +1,117 @@
+name: Build
+
+# Dos etapas porque son dos cosas distintas:
+#   - el nucleo es ISO puro: se compila y se prueba en segundos, en cualquier
+#     agente, y es donde esta la logica que hay que proteger.
+#   - la app WinUI necesita la carga de trabajo de WinUI, que tarda en
+#     instalarse. Va en un job aparte para no bloquear al primero.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  DASO_CXX_STANDARD: c++26preview
+
+jobs:
+  core:
+    name: Núcleo (ISO C++26, sin Windows SDK)
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Herramientas de compilación MSVC
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Comprobar que el catálogo generado está al día
+        shell: pwsh
+        run: |
+          python DASO-WinUI3/tools/generate_catalog.py --check
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "catalog_data.hpp desactualizado. Ejecuta: python DASO-WinUI3/tools/generate_catalog.py"
+            exit 1
+          }
+
+      - name: Configurar CMake
+        run: cmake -S DASO-WinUI3 -B build -DCMAKE_BUILD_TYPE=Release -DDASO_PLATFORM=ON
+
+      - name: Compilar
+        run: cmake --build build --config Release
+
+      - name: Pruebas
+        run: ctest --test-dir build -C Release --output-on-failure
+
+      - name: Informar del estándar realmente usado
+        shell: pwsh
+        run: |
+          cmake -S DASO-WinUI3 -B build -LA | Select-String 'DASO_CXX_STANDARD'
+
+  app:
+    name: Aplicación WinUI 3
+    runs-on: windows-2022
+    needs: core
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Habilitar GNUstep en Windows
+        run: |
+          # Requisito de la extensión de WinUI en agentes sin VS completo.
+          choco install gnustep -y --no-progress --limit-output
+        shell: pwsh
+
+      - name: Instalar Visual Studio 2022 con la carga de trabajo de WinUI
+        run: |
+          & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" `
+            -latest -products * `
+            -requires Microsoft.VisualStudio.Workload.Universal `
+            -property installationPath
+        shell: pwsh
+
+      - uses: microsoft/setup-msbuild@v2
+
+      - name: Restaurar paquetes NuGet
+        run: msbuild DASO-WinUI3/daso.sln -t:Restore -p:Configuration=Release -p:Platform=x64
+
+      - name: Compilar
+        run: msbuild DASO-WinUI3/daso.sln -p:Configuration=Release -p:Platform=x64 -m
+
+      - name: Subir el ejecutable autocontenido
+        uses: actions/upload-artifact@v4
+        with:
+          name: daso-win-x64
+          path: |
+            x64/Release/**/*.exe
+            x64/Release/**/*.dll
+            x64/Release/**/*.pri
+            x64/Release/**/*.resources.dll
+          if-no-files-found: error
+
+  installer:
+    name: Instalador (Inno Setup)
+    runs-on: windows-2022
+    needs: app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: daso-win-x64
+          path: staged
+
+      - name: Compilar el .iss
+        run: |
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) {
+            Write-Error "Inno Setup 6 no encontrado"
+            exit 1
+          }
+          & $iscc /DPublishDir="staged" DASO-WinUI3/installer/daso.iss
+        shell: pwsh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: daso-installer
+          path: installer/output/D.A.S.O-*.exe
+          if-no-files-found: error
