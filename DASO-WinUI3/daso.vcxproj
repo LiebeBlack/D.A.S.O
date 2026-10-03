@@ -34,9 +34,18 @@
     <RootNamespace>dasoui</RootNamespace>
     <ProjectName>daso</ProjectName>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <!-- Sin /ZW y sin XAML: este proyecto no es un "WinRT project". -->
+    <!--
+      Sin /ZW y sin XAML: este proyecto no es un "WinRT project".
+
+      ApplicationType NO se declara. Poner "Windows Store" le dice a NuGet que
+      la app es UWP y exige el framework UAP,Version=v10.0, que es
+      precisamente lo que un despliegue unpackaged no puede enlazar:
+        error : Your project does not reference "UAP,Version=v10.0" framework.
+
+      Para una app de escritorio portable la ausencia de ApplicationType es lo
+      correcto, no una omision.
+    -->
     <AppContainerApplication>false</AppContainerApplication>
-    <ApplicationType>Windows Store</ApplicationType>
   </PropertyGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -67,6 +76,16 @@
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.5.1" />
     <!-- 3.0.x: la linea con soporte de modulos y C++20/23 mas alla de la 2.0. -->
     <PackageReference Include="Microsoft.Windows.CppWinRT" Version="3.0.260818.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      Despliegue sin paquete: se quita la referencia de framework UAP que
+      arrastran las plantillas de WinUI. Es el otro mitad del arreglo del
+      error de NuGet, y se deja explicito para que no vuelva al restaurarse
+      paquetes de forma automatica.
+    -->
+    <FrameworkReference Remove="UAP" />
   </ItemGroup>
 
   <ItemDefinitionGroup>
